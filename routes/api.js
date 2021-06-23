@@ -129,7 +129,7 @@ router.get('/api/user', async (req, res) => {
 })
 
 
-// Update one user by id
+// Update one user by id (params method)
 router.put('/api/users/:id', async (req, res) => {
 	console.log(`PUT user ${req.params.id}`)
 
@@ -147,6 +147,35 @@ router.put('/api/users/:id', async (req, res) => {
 
 	/*
 	database.query('UPDATE users SET ? WHERE id = ?', [req.body, req.params.id], (err, rows, fields) => {
+		if(err)
+			return res.sendResponse(messages.internalServerError)
+
+		if (rows.affectedRows == 0)
+			return res.sendResponse(messages.notFound)
+
+		res.sendResponse(messages.ok)
+	})
+	*/
+})
+
+// Update one user by id (POST method)
+router.put('/api/users', async (req, res) => {
+	console.log(`PUT user ${req.body.id}`)
+
+	try {
+		const { affectedRows } = await database.queryPromisify('UPDATE users SET ? WHERE id = ?', [req.body, req.body.id])
+
+		if (affectedRows != 0)
+			res.sendResponse(messages.ok)
+		else
+			res.sendResponse(messages.notFound)
+
+	} catch (error) {
+		res.sendResponse(messages.internalServerError)
+	}
+
+	/*
+	database.query('UPDATE users SET ? WHERE id = ?', [req.body, req.body.id], (err, rows, fields) => {
 		if(err)
 			return res.sendResponse(messages.internalServerError)
 
@@ -187,12 +216,12 @@ router.delete('/api/users/:id', async (req, res) => {
 	*/
 })
 
-// Delete one user by id (SET method)
+// Delete one user by id (POST method)
 router.delete('/api/users', async (req, res) => {
-	console.log(`DELETE user id = ${req.query.id}`)
+	console.log(`DELETE user id = ${req.body.id}`)
 
 	try {
-		const { affectedRows } = await database.queryPromisify('DELETE FROM users WHERE id = ?', [req.query.id])
+		const { affectedRows } = await database.queryPromisify('DELETE FROM users WHERE id = ?', [req.body.id])
 
 		if (affectedRows != 0)
 			res.sendResponse(messages.ok)
@@ -204,7 +233,7 @@ router.delete('/api/users', async (req, res) => {
 	}
 
 	/*
-	database.query("DELETE FROM users WHERE id = ?", [req.query.id], (err, rows, fields) => {
+	database.query("DELETE FROM users WHERE id = ?", [req.body.id], (err, rows, fields) => {
 		if (err)
 			return res.sendResponse(messages.internalServerError)
 
