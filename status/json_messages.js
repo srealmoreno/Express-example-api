@@ -4,7 +4,7 @@ const http = require('./json_codes')
 
 
 const messages = {
-	success: (data) => {
+	success: (data = []) => {
 		return {
 			code: http.ok.code,
 			body: {
@@ -15,17 +15,20 @@ const messages = {
 		}
 	},
 
-	failed: (reason) => {
+	failed: (error = '') => {
 		return {
 			code: http.conflict.code,
 			body: {
 				status: failed,
-				reason: reason
+				error: {
+					message: error,
+					code: http.conflict.code
+				}
 			}
 		}
 	},
 
-	make: ({ code, success, data = undefined, reason = undefined }) => {
+	make: ({ code = 200, success = true, data = undefined, errorMsg = '' }) => {
 		let message = {
 			code: code,
 			body: {
@@ -36,8 +39,11 @@ const messages = {
 
 		if (data)
 			message.body["data"] = data
-		else if (reason)
-			message.body['reason'] = reason
+		else if (errorMsg)
+			message.body['error'] = {
+				message: errorMsg,
+				code: code
+			}
 
 		return message
 	},
@@ -55,7 +61,10 @@ const messages = {
 		body: {
 			success: false,
 			status: failed,
-			reason: "Empty List"
+			error: {
+				message: "Empty List",
+				code: http.notFound.code
+			}
 		}
 	},
 
@@ -64,7 +73,10 @@ const messages = {
 		body: {
 			success: false,
 			status: failed,
-			reason: http.notFound.desc
+			error: {
+				message: http.notFound.desc,
+				code: http.notFound.code
+			}
 		}
 	},
 
@@ -73,7 +85,10 @@ const messages = {
 		body: {
 			success: false,
 			status: failed,
-			reason: http.badRequest.desc
+			error: {
+				message: http.badRequest.desc,
+				code: http.badRequest.code
+			}
 		}
 	},
 
@@ -82,7 +97,10 @@ const messages = {
 		body: {
 			success: false,
 			status: failed,
-			reason: http.forbidden.desc
+			error: {
+				message: http.forbidden.desc,
+				code: http.forbidden.code
+			}
 		}
 	},
 
@@ -91,7 +109,10 @@ const messages = {
 		body: {
 			success: false,
 			status: failed,
-			reason: http.internalServerError.desc
+			error: {
+				message: http.internalServerError.desc,
+				code: http.internalServerError.code
+			}
 		}
 	}
 }
