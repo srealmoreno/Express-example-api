@@ -36,7 +36,7 @@ const http = {
 		desc: 'Not Acceptable'
 	},
 	conflict: {
-		code: 406,
+		code: 409,
 		desc: 'Conflict'
 	},
 
